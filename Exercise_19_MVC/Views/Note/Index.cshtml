@@ -1,0 +1,43 @@
+﻿@model IEnumerable<Exercise_21.Models.Note>
+
+@{
+    ViewData["Title"] = "Телефонный справочник";
+}
+
+<h1>Телефонный справочник</h1>
+
+<p>
+    <a asp-action="Create">Добавить новую запись</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Фамилия</th>
+            <th>Имя</th>
+            <th>Отчество</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                    <a asp-action="Details" asp-route-id="@item.ID">@Html.DisplayFor(modelItem => item.ID)</a>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LastName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Patronymic)
+            </td>
+            <td>
+                    <a asp-action="Delete" asp-route-id="@item.ID">Удалить</a>
+                    <a asp-action="Edit" asp-route-id="@item.ID">Редактировать</a>
+            </td>               
+        </tr>
+}      
+    </tbody>
+</table>
