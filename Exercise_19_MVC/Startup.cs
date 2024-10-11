@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using System;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Exercise_21
@@ -23,13 +24,14 @@ namespace Exercise_21
             services.AddDbContext<PhoneBookContext>(options => options.UseSqlServer(
                 Configuration.GetConnectionString("PhoneBookContext")));
             services.AddTransient<INoteData, NoteData>();
-
             services.AddMvc(options => options.EnableEndpointRouting = false);
 
             services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<PhoneBookContext>()
                 .AddDefaultTokenProviders();
-            services.AddAuthorization();
+            services.AddAuthorization(
+                
+            );
 
             services.Configure<IdentityOptions>(options =>
             {
@@ -43,10 +45,10 @@ namespace Exercise_21
             {
                 // конфигурация Cookie с целью использования их для хранения авторизации
                 options.Cookie.HttpOnly = true;
-                options.Cookie.Expiration = TimeSpan.FromMinutes(30);
                 options.LoginPath = "/Account/Login";
                 options.LogoutPath = "/Account/Logout";
-                options.SlidingExpiration = true;
+                options.SlidingExpiration = false;
+          
             });
 
         }
@@ -55,13 +57,11 @@ namespace Exercise_21
         {
             app.UseStaticFiles();
             app.UseAuthentication();
-            app.UseAuthorization();
+            app.UseAuthorization();         
             app.UseMvc(routes =>
-            {
                 routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Note}/{action=Index}/{id?}");
-            });
+                name: "default",
+                template: "{controller=Note}/{action=Index}/{id?}"));
         }
     }
 }

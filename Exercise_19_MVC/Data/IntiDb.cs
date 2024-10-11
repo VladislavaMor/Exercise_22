@@ -1,32 +1,41 @@
 ﻿using Exercise_21.Data;
 using Exercise_21.Models;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.CodeAnalysis.Elfie.Extensions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Policy;
+using System.Threading.Tasks;
 
 namespace Exercise_21
 {
     public static class DbInitializer
     {
-        public static void Initialize(PhoneBookContext context)
+
+        public static async Task Initialize(IWebHost init)
         {
+            var s = init.Services.CreateScope().ServiceProvider;
+            var context = s.GetRequiredService<PhoneBookContext>();
             context.Database.EnsureCreated();
-
-            if (!context.Roles.Any())
+            var _roleManager = s.GetRequiredService<RoleManager<IdentityRole>>();
+            var roles = new[] { "admin", "user" };
+            foreach (var role in roles)
             {
-                Role adminRole = new Role { Name = "admin" };
-                Role userRole = new Role { Name = "user" };
-                context.Roles.Add(adminRole);
-                context.Roles.Add(userRole);
+                if (!await _roleManager.RoleExistsAsync(role))
+                    await _roleManager.CreateAsync(new IdentityRole(role));
             }
-            if (!context.Users.Any())
-            {
-                string adminEmail = "admin@mail.ru";
-                string adminPassword = "123456";
+            var _userManager = s.GetRequiredService<UserManager<User>>();
 
-                User adminUser = new User { Email = adminEmail, PasswordHash = adminPassword.ToSHA256String() };
+            if (! await _userManager.Users.AnyAsync())
+            {
+                var adminUser = new User { UserName = "admin" };               
+                var createResult1 = await _userManager.CreateAsync(adminUser, "Qwerty_123");
+                var addToRoleAdmin = await _userManager.AddToRoleAsync(adminUser, "admin");
+
+                var user = new User { UserName = "user" };
+                var createResult2 = await _userManager.CreateAsync(user, "Qwerty_123");
+                var addToRoleUser = await _userManager.AddToRoleAsync(adminUser, "user");
             }
             if (context.Notes.Any()) return;
 

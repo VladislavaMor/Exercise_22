@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace Exercise_21
 {
@@ -10,7 +11,7 @@ namespace Exercise_21
 
         [Required, DataType(DataType.Password)]
         public string Password { get; set; }
-
         public string ReturnUrl { get; set; }
+
     }
 }

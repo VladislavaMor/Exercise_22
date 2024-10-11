@@ -1,20 +1,20 @@
 ﻿using Exercise_21.Data;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.Data.Entity;
+using System.Threading.Tasks;
+
 namespace Exercise_21
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var init = BuildWebHost(args);
-            using (var scope = init.Services.CreateScope())
-            {
-                var s = scope.ServiceProvider;
-                var c = s.GetRequiredService<PhoneBookContext>();
-                DbInitializer.Initialize(c);
-            }
+            await DbInitializer.Initialize(init);
             init.Run();
         }
 

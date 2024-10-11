@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Exercise_21
@@ -11,11 +12,11 @@ namespace Exercise_21
 
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-        private readonly RoleManager<Role> _roleManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
         private PhoneBookContext _context;
 
-        public AccountController(PhoneBookContext context, UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<Role> roleManager)
+        public AccountController(PhoneBookContext context, UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager)
         {
             _context = context;
             _userManager = userManager;
@@ -68,15 +69,17 @@ namespace Exercise_21
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(UserRegistration model)
         {
+            string defaultRole = "user";
+
             if (ModelState.IsValid)
             {
                 var user = new User { UserName = model.LoginProp };
-                Role userRole = await _roleManager.Roles.FirstOrDefaultAsync(r => r.Name == "user");
-                if (userRole != null)
-                    user.Role = userRole;
+
                 var createResult = await _userManager.CreateAsync(user, model.Password);
 
-                if (createResult.Succeeded)
+                var addToRole = await _userManager.AddToRoleAsync(user, defaultRole);
+
+                if (createResult.Succeeded && addToRole.Succeeded)
                 {
                     await _signInManager.SignInAsync(user, false);
                     return RedirectToAction("Index", "Note");

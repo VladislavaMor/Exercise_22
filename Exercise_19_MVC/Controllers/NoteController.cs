@@ -32,16 +32,14 @@ namespace Exercise_21.Controllers
             return View(user);
         }
 
-        // GET: Users/Create
+        [HttpGet]
         [Authorize]
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Users/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public IActionResult Create([Bind("ID,LastName,FirstName,Patronymic,Phone,Address,Description")] Note user)
         {
             if (ModelState.IsValid)
@@ -52,8 +50,8 @@ namespace Exercise_21.Controllers
             return View(user);
         }
 
-        // GET: Users/Edit/5
-        [Authorize]
+        [HttpGet]
+        [Authorize(Roles = "admin")]
         public IActionResult Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -62,10 +60,7 @@ namespace Exercise_21.Controllers
             return View(note);
         }
 
-        // POST: Users/Edit/5
-        [Authorize]
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, [Bind("ID,LastName,FirstName,Patronymic,Phone,Address,Description")] Note note)
         {
             if (id != note.ID) return NotFound();
@@ -86,8 +81,8 @@ namespace Exercise_21.Controllers
             return View(note);
         }
 
-        // GET: Users/Delete/5
-        [Authorize]
+        [HttpGet]
+        [Authorize(Roles = "admin")]
         public IActionResult Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -96,8 +91,7 @@ namespace Exercise_21.Controllers
             return View(note);
         }
 
-        // POST: Users/Delete/5
-        [Authorize]
+
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
